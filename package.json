@@ -23,6 +23,9 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@ethersproject/providers": "^5.7.2"
+		"@ethersproject/contracts": "^5.7.0",
+		"@ethersproject/providers": "^5.7.2",
+		"named-logs": "^0.2.2",
+		"web3w": "^0.3.2-beta.22"
 	}
 }

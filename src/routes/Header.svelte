@@ -8,7 +8,8 @@
 
 	<NavBar
 		links={[
-			{href: url(''), title: 'Home'}
+			{href: url(''), title: 'Home'},
+			{href: url('permit/'), title: 'Permit'},
 		]}
 	/>
 
