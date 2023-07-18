@@ -1,4 +1,5 @@
-import _contractsInfos from '$lib/contracts.json';
+import _contractsInfos from '$lib/blockchain/data/contracts';
+
 import { readable } from 'svelte/store';
 
 export const initialContractsInfos = _contractsInfos;
