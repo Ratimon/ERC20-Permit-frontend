@@ -14,15 +14,14 @@ import { chainId, chainName, fallbackProviderOrUrl, webWalletURL } from '$lib/co
 // import { contractsInfos } from '$lib/blockchain/contracts';
 // import _contractsInfos from '$lib/contracts.json';
 import _contractsInfos from '$lib/blockchain/data/contracts';
-
-import type { PermitSigning } from './Permit.model';
+import type { PermitData } from './Permit.model';
 
 
 export class PermitRepository {
 
     provider: Provider;
     contract: Contract;
-    getPermit: Writable<PermitSigning>;
+    getPermit: Writable<PermitData>;
 
     constructor() {
         console.log('chainId',chainId);
@@ -42,34 +41,28 @@ export class PermitRepository {
     
         this.getPermit = writable({
             contractAddress: this.contract.address,
-            currentAccount: "",
-            currentAllowanceInWei: BigNumber.from("0")
+            currentAccount: ""
         })
       }
 
       async refresh() {
         let provider: Provider| JsonRpcProvider = wallet.provider || fallback.provider || wallet.fallbackProvider;
     
-        console.log('refreshing...');
-        console.log('_contractsInfos',_contractsInfos);
+        // console.log('refreshing...');
+        // console.log('_contractsInfos',_contractsInfos);
     
-
-        console.log(`being connected`);
-        // console.log(`provider`,await provider.getNetwork());
-    
-        if(!(await this.isNetworkConnected(provider)) && chainId=='1337'){
-          console.log("set new provider")
+        if(!(await this.isNetworkConnected(provider)) && chainId=='31337'){
+        //   console.log("set new provider")
           provider = this.provider
         } 
     
         this.contract = await this.contract.connect(provider);
     
-        console.log(`connected`);
+        // console.log(`connected`);
     
         this.getPermit.set({
             contractAddress: this.contract.address,
-            currentAccount: wallet.address || '',
-            currentAllowanceInWei: BigNumber.from("0")
+            currentAccount: wallet.address || ''
         })
     
       }
@@ -96,7 +89,11 @@ export class PermitRepository {
         // let {owner, spender, valueToApproveInWEI }=  programmersModel;
         let {spender, valueToApproveInWEI }=  programmersModel;
 
+        console.log("spender", spender);
+        console.log("valueToApproveInWEI", valueToApproveInWEI);
+
         const owner =  wallet.address;
+        console.log("owner", owner);
         const deadline = +new Date() + 60 * 60;
 
         console.log("deadline: " + deadline);
@@ -131,21 +128,45 @@ export class PermitRepository {
             message: {
               owner: owner,
               spender: spender,
-              value: valueToApproveInWEI,
+              value: valueToApproveInWEI.toString(),
               nonce: nonce,
               deadline: deadline
             }
-          };
+        };
 
-        let signature = await (this.provider as JsonRpcProvider).send("eth_signTypedData_v4",
+        let provider: Provider| JsonRpcProvider = wallet.provider || fallback.provider || wallet.fallbackProvider;
+
+
+        // let signer = await (this.provider as JsonRpcProvider).getSigner();
+        // let signature = await signer.provider.send("eth_signTypedData_v4",
+        //   [owner, JSON.stringify(typedData)]
+        // );
+
+        let signer = await (provider as JsonRpcProvider).getSigner(wallet.address);
+        console.log('signer',signer)
+        console.log('wallet.address',wallet.address)
+        let signature =  await signer.provider.send("eth_signTypedData_v4",
           [owner, JSON.stringify(typedData)]
         );
 
-        const split = (ethers as any).utils.splitSignature(signature);
+        console.log('signature',signature)
+
+       
+
+        // const split = ethers.utils.splitSignature(signature);
+        const  split = ethers.Signature.from(signature);
 
         console.log("r: ", split.r);
         console.log("s: ", split.s);
         console.log("v: ", split.v);
+
+        // let r = signature.slice(0, 66)
+        // let s = '0x' + signature.slice(66, 130)
+        // let v = '0x' + signature.slice(130, 132)
+
+        // console.log("r: ", signature.slice(0, 66));
+        // console.log("s: ", '0x' + signature.slice(66, 130));
+        // console.log("v: ", '0x' + signature.slice(130, 132));
     
 
         // permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s)
@@ -158,9 +179,9 @@ export class PermitRepository {
             spender,
             valueToApproveInWEI,
             deadline,
+            split.v,
             split.r,
-            split.s,
-            split.v
+            split.s
           );
         } else {
     
@@ -170,9 +191,9 @@ export class PermitRepository {
                 spender,
                 valueToApproveInWEI,
                 deadline,
+                split.v,
                 split.r,
-                split.s,
-                split.v
+                split.s
             );
           });
         }

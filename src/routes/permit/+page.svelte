@@ -17,7 +17,7 @@
     
     let spender: string;
     let valueToApproveInETH: BigNumber| Number | undefined;
-
+  
     let getPermitPresenter = new GetPermitPresenter();
     let signPermitPresenter = new SignPermitPresenter();
 
@@ -42,13 +42,12 @@
     await getPermitPresenter.load(generatedViewModel => {
         contractAddress = generatedViewModel.contractAddress;
         currentAccount = generatedViewModel.currentAccount;
-        valueToApproveInETH = generatedViewModel.valueToApproveInETH;
       });
   }
 
   async function refreshAgainAndAgain() {
     await refresh();
-    timeout = setTimeout(refreshAgainAndAgain, 1000);
+    timeout = setTimeout(refreshAgainAndAgain, 2000);
   }
 
   onMount(async () => {
@@ -91,31 +90,30 @@
             <input
               class="appearance-none bg-transparent border-none w-full text-gray-700 dark:text-gray-300 mr-3 py-1 px-2
                       leading-tight focus:outline-none"
-              type="number"
-              placeholder="0.0 ETH"
-              aria-label="value to approve"
-              bind:value={valueToApproveInETH}
-              name="valueToApproveInETH"
-              
+              type="text"
+              placeholder="Please fill spender"
+              aria-label="spender"
+              bind:value={spender}
+              name="spender"
             />
           </div>
           <div class="flex items-center border-b border-pink-600 py-2">
             <input
               class="appearance-none bg-transparent border-none w-full text-gray-700 dark:text-gray-300 mr-3 py-1 px-2
                       leading-tight focus:outline-none"
-              type="text"
-              placeholder="Please fill spender"
-              aria-label="spender"
-              bind:value={spender}
-              name="spender"
-              
+              type="number"
+              placeholder="0.0 ETH"
+              aria-label="value to approve"
+              bind:value={valueToApproveInETH}
+              name="valueToApproveInETH"
             />
           </div>
+
           <div class="flex items-center">
             <NavButton
               label="permit"
               class="big secondary"
-              disabled={!valueToApproveInETH || valueToApproveInETH === 0 || typeof valueToApproveInETH != 'number'}
+              disabled={!valueToApproveInETH || valueToApproveInETH === 0 || typeof valueToApproveInETH != 'number' || !spender}
               on:click={permit}
             >
               Permit

@@ -8,13 +8,11 @@ export default class GetPermitPresenter {
     load = async (callback: any)  => {
         await permitRepository.getPermitData( getPermitPm => {
     
-           let {contractAddress, currentAccount, currentAllowanceInWei}=  getPermitPm;
+           let {contractAddress, currentAccount}=  getPermitPm;
     
           const getPermitVm = {
                 contractAddress: contractAddress,
-                currentAccount: currentAccount,
-                currentAllowanceEth: formatUnits(currentAllowanceInWei, 18),
-              
+                currentAccount: currentAccount              
             };
     
           callback(getPermitVm);
