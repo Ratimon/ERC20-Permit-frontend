@@ -148,7 +148,7 @@
           </form>
         {:else}
           <h2 class="text-3xl tracking-tight font-extrabold text-gray-900 dark:text-gray-100 sm:text-4xl">
-            Connect to Open the Position
+            Connect to Permit
           </h2>
   
           <form class="mt-5 w-full max-w-sm">
